@@ -9,21 +9,23 @@ export function signinUser({email, password}) {
 
     // submit email and password to server
     const request = axios.post(`${ROOT_URL}/signin`, {email, password})
-    request.then(response => {
-      // -if request is good, we need to update state to indicate user is authenticated
+    request
+      .then(response => {
+        // -if request is good, we need to update state to indicate user is authenticated
 
-      dispatch({type: AUTH_USER})
-      // -Save the JWT token
+        dispatch({type: AUTH_USER})
+        // -Save the JWT token
 
-      localStorage.setItem('token', response.data.token)
+        localStorage.setItem('token', response.data.token)
 
-      // -redirect to the route '/feature'
+        // -redirect to the route '/feature'
 
-      browserHistory.push('/feature')
+        browserHistory.push('/feature')
 
-    }).catch(() => {
-      dispatch(authError('bad login info'))
-    })
+      })
+      .catch(() => {
+        dispatch(authError('bad login info'))
+      })
 
 
     // If request is bad...
@@ -35,6 +37,22 @@ export function signoutUser() {
   localStorage.removeItem('token')
   return {
     type: UNAUTH_USER
+  }
+}
+
+export function signupUser({email, password}) {
+  return function (dispatch) {
+    axios.post(`${ROOT_URL}/signup`, {email, password})
+      .then(response => {
+        dispatch({type: AUTH_USER})
+
+        localStorage.setItem('token', response.data.token)
+
+        browserHistory.push('/feature')
+      })
+      .catch(({response}) => {
+        dispatch(authError(response.data.error))
+      })
   }
 }
 
