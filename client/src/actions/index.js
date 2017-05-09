@@ -1,10 +1,46 @@
+import axios from 'axios'
+import { browserHistory } from 'react-router'
+import { UNAUTH_USER, AUTH_USER, AUTH_ERROR } from './types'
+const ROOT_URL = 'http://localhost:3090'
+
 export function signinUser({email, password}) {
-  // submit email and password to server
 
-  // -if request is good, we need to update state to indicate user is authenticated
-  // -Save the JWT token
-  // -redirect to the route '/feature'
+  return function (dispatch) {
 
-  // If request is bad...
-  // -Show an error to the user
+    // submit email and password to server
+    const request = axios.post(`${ROOT_URL}/signin`, {email, password})
+    request.then(response => {
+      // -if request is good, we need to update state to indicate user is authenticated
+
+      dispatch({type: AUTH_USER})
+      // -Save the JWT token
+
+      localStorage.setItem('token', response.data.token)
+
+      // -redirect to the route '/feature'
+
+      browserHistory.push('/feature')
+
+    }).catch(() => {
+      dispatch(authError('bad login info'))
+    })
+
+
+    // If request is bad...
+    // -Show an error to the user
+  }
+}
+
+export function signoutUser() {
+  localStorage.removeItem('token')
+  return {
+    type: UNAUTH_USER
+  }
+}
+
+export function authError(error) {
+  return {
+    type: AUTH_ERROR,
+    payload: error
+  }
 }
