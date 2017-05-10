@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 
 class Header extends Component {
 
@@ -16,6 +16,9 @@ class Header extends Component {
         </li>,
         <li key={2} className="nav-item">
           <Link className="nav-link" to="/signup">Sign Up</Link>
+        </li>,
+        <li key={3} className="nav-item">
+          <Link className="nav-link" to="/feature">Protected Site</Link>
         </li>
       ]
     }

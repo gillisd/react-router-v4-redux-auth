@@ -1,26 +1,29 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Route, Redirect } from 'react-router-dom'
 
-export default function (ComposedComponent) {
+export const PrivateRoute = ({component: ComposedComponent, ...rest}) => {
+
   class Authentication extends Component {
-    static contextTypes = {
-      router: React.PropTypes.object
-    }
 
-    componentWillMount() {
+    handleRender(props) {
       if (!this.props.authenticated) {
-        this.context.router.push('/');
-      }
-    }
-
-    componentWillUpdate(nextProps) {
-      if (!nextProps.authenticated) {
-        this.context.router.push('/');
+        return <Redirect to={{
+          pathname: '/signin',
+          state: {
+            from: props.location,
+            needAuthentication: true
+          }
+        }}/>
+      } else {
+        return <ComposedComponent {...props}/>
       }
     }
 
     render() {
-      return <ComposedComponent {...this.props} />
+      return (
+        <Route {...rest} authenticated={this.props.authenticated} render={this.handleRender.bind(this)}/>
+      )
     }
   }
 
@@ -28,5 +31,6 @@ export default function (ComposedComponent) {
     return {authenticated: state.auth.authenticated};
   }
 
-  return connect(mapStateToProps)(Authentication);
+  const AuthenticationContainer = connect(mapStateToProps)(Authentication)
+  return <AuthenticationContainer/>
 }
