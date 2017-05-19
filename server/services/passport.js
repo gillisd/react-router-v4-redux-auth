@@ -28,7 +28,7 @@ const localLogin = new LocalStrategy(localOptions, function (email, password, do
       }
       return done(null, user);
     })
-    // compare passwords - is `passowrd` equal to user.password?
+    // compare passwords - is `password` equal to user.password?
   })
 
 });

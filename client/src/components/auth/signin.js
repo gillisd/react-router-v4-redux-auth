@@ -12,9 +12,9 @@ class Signin extends Component {
     }
   }
 
-  handleRedirectErrors() {
+  displayRedirectMessages() {
     const location = this.props.location
-    return location.state && location.state.needAuthentication && <div>You need to sign in</div>
+    return location.state && <div className="alert alert-danger">{location.state.message}</div>
   }
 
   handleSubmit({email, password}) {
@@ -39,7 +39,7 @@ class Signin extends Component {
       }}/>
       :
       <div>
-        {this.handleRedirectErrors()}
+        {this.displayRedirectMessages()}
         <SigninForm onSubmit={this.handleSubmit.bind(this)} errorMessage={this.props.errorMessage}/>
       </div>
   }

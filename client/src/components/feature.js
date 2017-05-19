@@ -19,7 +19,7 @@ class Feature extends Component {
         <p>{this.props.message}</p>
         ____________________________________________________________
         <br/>
-        <p>Try clicking these links and see what happens:</p>
+        <p>Notice that clicking these links redirect to the homepage, as you are already signed in:</p>
         <p>
           <Link to={'/signin'}>/signin</Link> | <Link to={'/signup'}>/signup</Link>
         </p>
