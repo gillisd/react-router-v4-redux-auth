@@ -1,46 +1,42 @@
 import React, { Component } from 'react'
-import { reduxForm, Field } from 'redux-form' // imported Field
-import TextField from 'material-ui/TextField'
+import { reduxForm, Field } from 'redux-form'
+import { renderTextField } from './form_helpers'
 import RaisedButton from 'material-ui/RaisedButton'
 
-const renderTextField = ({input, type, label, meta: {touched, error}, ...custom}) => (  // Define stateless component to render input and errors
-  <div>
-    <TextField
-      type={type}
-      floatingLabelText={label}
-      {...input}
-      {...custom}
-    />
-    {touched && error && <span className="error">{error}</span>}
-  </div>
-)
 
 class SigninForm extends Component {
-  render() {
 
+  renderAlert() {
+    if (this.props.errorMessage) {
+      return <div className="alert alert-danger">
+        <strong>Oops: </strong>{this.props.errorMessage}
+      </div>
+    }
+  }
+
+  render() {
     const {handleSubmit} = this.props
 
     return (
-      <form onSubmit={handleSubmit}>
+      <div>
+        {this.renderAlert()}
+        <form onSubmit={handleSubmit}>
 
-        <div>
           <Field
             label="Username"
             name="email"
             component={renderTextField}
             type="text"/>
-        </div>
 
-        <div>
           <Field
             label="Password"
             name="password"
             component={renderTextField}
             type="password"/>
-        </div>
 
-        <RaisedButton type="submit" primary={true}>Sign In</RaisedButton>
-      </form>
+          <RaisedButton type="submit" label="Sign In" primary={true} labelColor={'#FFFFFF'}/>
+        </form>
+      </div>
     )
   }
 }

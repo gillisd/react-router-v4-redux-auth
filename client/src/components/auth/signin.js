@@ -2,68 +2,54 @@ import React, { Component } from 'react'
 import SigninForm from './signin_form'
 import * as actions from '../../actions'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
 
 class Signin extends Component {
+
+  componentWillUnmount() {
+    if (this.props.errorMessage) {
+      this.props.authError(null)
+    }
+  }
 
   handleRedirectErrors() {
     const location = this.props.location
     return location.state && location.state.needAuthentication && <div>You need to sign in</div>
   }
 
-
-  handleFormSubmit({email, password}) {
+  handleSubmit({email, password}) {
     this.props.signinUser({email, password})
   }
 
-  render() {
-    return (
-      <div>
-        {this.handleRedirectErrors()}
-        <SigninForm onSubmit={this.handleFormSubmit.bind(this)}/>
-      </div>
-    )
+  getRedirectPath() {
+    const locationState = this.props.location.state
+    if (locationState && locationState.from.pathname) {
+      return locationState.from.pathname // redirects to referring url
+    } else {
+      return '/'
+    }
   }
 
+  render() {
+    return (this.props.authenticated) ?
+      <Redirect to={{
+        pathname: this.getRedirectPath(), state: {
+          from: this.props.location
+        }
+      }}/>
+      :
+      <div>
+        {this.handleRedirectErrors()}
+        <SigninForm onSubmit={this.handleSubmit.bind(this)} errorMessage={this.props.errorMessage}/>
+      </div>
+  }
 }
 
-export default connect(null, actions)(Signin)
+function mapStateToProps(state) {
+  return {
+    authenticated: state.auth.authenticated,
+    errorMessage: state.auth.error
+  }
+}
 
-//   renderAlert() {
-//     if(this.props.errorMessage) {
-//       return (
-//         <div className="alert alert-danger">
-//           <strong>Oops: </strong>{this.props.errorMessage}
-//         </div>
-//       )
-//     }
-//   }
-//
-//   render() {
-//
-//     const {handleSubmit, fields: {email, password}} = this.props
-//
-//     return (
-//       <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-//         <fieldset className="form-group">
-//           <label>Email:</label>
-//           <input {...email} type="text" className="form-control"/>
-//         </fieldset>
-//         <fieldset className="form-group">
-//           <label>Password:</label>
-//           <input {...password} type="text" className="form-control"/>
-//         </fieldset>
-//         {this.renderAlert()}
-//         <button action="submit" className="btn btn-primary">Sign in</button>
-//       </form>
-//     )
-//   }
-// }
-//
-// function mapStateToProps(state) {
-//   return {errorMessage: state.auth.error}
-// }
-
-// export default reduxForm({
-//   form: 'signin',
-//   fields: ['email', 'password']
-// }, mapStateToProps, actions)(Signin)
+export default connect(mapStateToProps, actions)(Signin)

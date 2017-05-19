@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../actions'
+import { Link } from 'react-router-dom'
 
 class Feature extends Component {
 
@@ -11,8 +12,17 @@ class Feature extends Component {
   render() {
     return (
       <div>
-        Welcome to the secure page!
+        <p><strong>Welcome to the secure page!</strong></p>
+        <br/>
+        <p>Here's a secret response from the server that your token returned:</p>
+        ____________________________________________________________
         <p>{this.props.message}</p>
+        ____________________________________________________________
+        <br/>
+        <p>Try clicking these links and see what happens:</p>
+        <p>
+          <Link to={'/signin'}>/signin</Link> | <Link to={'/signup'}>/signup</Link>
+        </p>
       </div>
 
     )

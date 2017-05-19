@@ -1,79 +1,49 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { reduxForm } from 'redux-form'
+import SignupForm from './signup_form'
 import * as actions from '../../actions'
+import { Redirect } from 'react-router-dom'
 
 class Signup extends Component {
 
-  handleFormSubmit(formProps) {
-    this.props.signupUser(formProps)
+  componentWillUnmount() {
+    if (this.props.errorMessage) {
+      this.props.authError(null)
+    }
   }
 
-  renderAlert() {
-    if (this.props.errorMessage) {
-      return <div className="alert alert-danger">
-        <strong>Oh no! </strong>{this.props.errorMessage}
-      </div>
+  handleSubmit({email, password, passwordConfirmation}) {
+    this.props.signupUser({email, password, passwordConfirmation})
+  }
+
+  getRedirectPath() {
+    const locationState = this.props.location.state
+    if (locationState && locationState.from.pathname) {
+      return locationState.from.pathname
+    } else {
+      return '/'
     }
   }
 
   render() {
-    const {handleSubmit, fields: {email, password, passwordConfirm}} = this.props
-    return (
-      <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-        <fieldset className="form-group">
-          <label>Email:</label>
-          <input className="form-control" {...email} />
-          {email.touched && email.error && <div className="error">{email.error}</div>}
-        </fieldset>
-        <fieldset className="form-group">
-          <label>Password:</label>
-          <input type="password" className="form-control" {...password} />
-          {password.touched && password.error && <div className="error">{password.error}</div>}
-        </fieldset>
-        <fieldset className="form-group">
-          <label>Confirm Password:</label>
-          <input type="password" className="form-control" {...passwordConfirm} />
-          {passwordConfirm.touched && passwordConfirm.error && <div className="error">{passwordConfirm.error}</div>}
-        </fieldset>
-        {this.renderAlert()}
-        <button action="submit" className="btn btn-primary">Sign Up</button>
-      </form>
-    )
+    return (this.props.authenticated) ?
+      <Redirect to={{
+        pathname: this.getRedirectPath(), state: {
+          from: this.props.location
+        }
+      }}/>
+      :
+      <div>
+        <SignupForm onSubmit={this.handleSubmit.bind(this)} errorMessage={this.props.errorMessage}/>
+      </div>
   }
-}
-
-function validate(formProps) {
-  const errors = {}
-
-  if (formProps.password != formProps.passwordConfirm) {
-    errors.password = 'Passwords must match'
-  }
-
-  if (!formProps.email) {
-    errors.email = 'Email must be present'
-  }
-
-  if (!formProps.password) {
-    errors.password = 'Password must be present'
-  }
-
-  if (!formProps.passwordConfirm) {
-    errors.passwordConfirm = 'Confirm your password'
-  }
-
-  return errors
 }
 
 function mapStateToProps(state) {
   return {
+    authenticated: state.auth.authenticated,
     errorMessage: state.auth.error
   }
 }
 
-export default reduxForm({
-  form: 'signup',
-  fields: ['email', 'password', 'passwordConfirm'],
-  validate: validate
-}, mapStateToProps, actions)
-(Signup)
+export default connect(mapStateToProps, actions)(Signup)
